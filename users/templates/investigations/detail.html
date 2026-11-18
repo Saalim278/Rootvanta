@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load tz %}
+
+{% block title %}{{ investigation.title }} | Rootvanta{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Investigation Details</h1>
+        <p class="page-subtitle">Review issue information and track resolution progress.</p>
+    </div>
+    <a href="{% url 'investigation_list' %}" class="btn btn-secondary">
+        ← Back to Investigations
+    </a>
+</div>
+
+<div class="detail-card">
+
+    <div class="detail-heading">
+        <div>
+            <span class="detail-label">INVESTIGATION</span>
+            <h2>{{ investigation.title }}</h2>
+        </div>
+
+        <div class="detail-badges">
+            <span class="priority-badge priority-{{ investigation.priority|lower }}">
+                {{ investigation.priority }}
+            </span>
+
+            <span class="status-badge status-{{ investigation.status|lower }}">
+                {{ investigation.get_status_display }}
+            </span>
+        </div>
+    </div>
+
+    <div class="detail-description">
+        <h3>Description</h3>
+        <p>{{ investigation.description|linebreaksbr }}</p>
+    </div>
+
+    <div class="detail-info-grid">
+        <div class="detail-info">
+            <span>Created By</span>
+            <strong>{{ investigation.created_by.username }}</strong>
+        </div>
+
+        <div class="detail-info">
+            <span>Created At</span>
+            <strong>{{ investigation.created_at|localtime|date:"d M Y, h:i A" }}</strong>
+        </div>
+
+        <div class="detail-info">
+            <span>Priority</span>
+            <strong>{{ investigation.priority }}</strong>
+        </div>
+
+        <div class="detail-info">
+            <span>Current Status</span>
+            <strong>{{ investigation.get_status_display }}</strong>
+        </div>
+    </div>
+
+    <div class="detail-actions">
+
+        <a href="{% url 'investigation_edit' investigation.pk %}"
+           class="btn btn-secondary">
+            Edit Investigation
+        </a>
+
+        {% if investigation.status != "RESOLVED" and investigation.status != "CLOSED" %}
+            <a href="{% url 'create_fix_attempt' investigation.pk %}"
+               class="btn btn-primary">
+                + Add Fix Attempt
+            </a>
+        {% endif %}
+
+        {% if user.role == "MANAGER" %}
+
+            {% if investigation.status == "RESOLVED" %}
+                <form method="POST"
+                      action="{% url 'close_investigation' investigation.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        Close Investigation
+                    </button>
+                </form>
+            {% endif %}
+
+            {% if investigation.status == "RESOLVED" or investigation.status == "CLOSED" %}
+                <form method="POST"
+                      action="{% url 'reopen_investigation' investigation.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning">
+                        Reopen Investigation
+                    </button>
+                </form>
+            {% endif %}
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<div class="history-card">
+
+    <div class="history-heading">
+        <div>
+            <h2>Fix Attempts History</h2>
+            <p>Recorded investigation and troubleshooting activities.</p>
+        </div>
+
+        <span class="attempt-count">
+            {{ fix_attempts|length }} Attempts
+        </span>
+    </div>
+
+    {% for attempt in fix_attempts %}
+
+        <div class="attempt-item">
+
+            <div class="attempt-top">
+                <h3>Attempt {{ forloop.counter }}</h3>
+
+                <span class="result-badge result-{{ attempt.result|lower }}">
+                    {{ attempt.result }}
+                </span>
+            </div>
+
+            <div class="attempt-content">
+                <div>
+                    <span class="attempt-label">Description</span>
+                    <p>{{ attempt.description }}</p>
+                </div>
+
+                <div>
+                    <span class="attempt-label">Solution</span>
+                    <p>{{ attempt.solution }}</p>
+                </div>
+            </div>
+
+            <div class="attempt-date">
+                {{ attempt.created_at|localtime|date:"d M Y, h:i A" }}
+            </div>
+
+        </div>
+
+    {% empty %}
+
+        <div class="empty-state">
+            <h3>No fix attempts yet</h3>
+            <p>Troubleshooting activities will appear here.</p>
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

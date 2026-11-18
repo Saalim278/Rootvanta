@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account | Rootvanta{% endblock %}
+
+{% block auth_content %}
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+
+        <div class="auth-brand">
+            <h1>Root<span>vanta</span></h1>
+            <p>Root Cause. Clear Resolution.</p>
+        </div>
+
+        <div class="auth-heading">
+            <h2>Create Account</h2>
+            <p>Join Rootvanta and start investigating issues.</p>
+        </div>
+
+        {% if form.errors %}
+            <div class="auth-error">
+                Please correct the errors below.
+            </div>
+        {% endif %}
+
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <small class="field-error">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary auth-submit">
+                Create Account
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account?
+            <a href="{% url 'login' %}">Log In</a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

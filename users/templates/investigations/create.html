@@ -1,0 +1,63 @@
+
+{% extends "base.html" %}
+
+{% block title %}Create Investigation | Rootvanta{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Create Investigation</h1>
+        <p class="page-subtitle">
+            Report a technical issue and start investigating its root cause.
+        </p>
+    </div>
+
+    <a href="{% url 'investigation_list' %}" class="btn btn-secondary">
+        ← Back to Investigations
+    </a>
+</div>
+
+<div class="form-card">
+
+    <div class="form-card-header">
+        <h3>Investigation Details</h3>
+        <p>Provide the issue information below.</p>
+    </div>
+
+    <form method="POST" class="investigation-form">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                    <small class="help-text">{{ field.help_text }}</small>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <small class="field-error">{{ error }}</small>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <div class="form-actions">
+            <a href="{% url 'investigation_list' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+
+            <button type="submit" class="btn btn-primary">
+                Create Investigation
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

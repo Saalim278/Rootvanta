@@ -1,0 +1,74 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Rootvanta{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+
+{% if user.is_authenticated %}
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="logo">Root<span>vanta</span></div>
+
+        <p class="nav-label">WORKSPACE</p>
+
+        <a href="{% url 'investigation_list' %}" class="nav-link">
+            <span>▦</span> Investigations
+        </a>
+
+        <a href="{% url 'investigation_create' %}" class="nav-link">
+            <span>＋</span> Create Investigation
+        </a>
+    </aside>
+
+    <div class="main-area">
+
+        <header class="topbar">
+            <h3>Rootvanta Workspace</h3>
+
+            <div class="user-info">
+                <div class="user-avatar">
+                    {{ user.username|first|upper }}
+                </div>
+
+                <div class="user-details">
+                    <strong>{{ user.username }}</strong>
+                    <span>{{ user.role }}</span>
+                </div>
+
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </header>
+
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+
+    </div>
+</div>
+
+{% else %}
+
+
+    <main class="auth-main">
+        {% block auth_content %}{% endblock %}
+    </main>
+
+{% endif %}
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}New Fix Attempt | Rootvanta{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>New Fix Attempt</h1>
+        <p class="page-subtitle">Record your troubleshooting process and findings.</p>
+    </div>
+
+    <a href="{% url 'investigation_detail' investigation.pk %}"
+       class="btn btn-secondary">
+        ← Back to Investigation
+    </a>
+</div>
+
+<div class="form-card">
+
+    <div class="form-card-header">
+        <h3>Investigation Information</h3>
+        <p>Recording attempt for the following investigation.</p>
+    </div>
+
+    <div class="linked-investigation">
+        <span>INVESTIGATION</span>
+        <strong>{{ investigation.title }}</strong>
+        <div class="detail-badges">
+            <span class="priority-badge priority-{{ investigation.priority|lower }}">
+                {{ investigation.priority }}
+            </span>
+            <span class="status-badge status-{{ investigation.status|lower }}">
+                {{ investigation.get_status_display }}
+            </span>
+        </div>
+    </div>
+
+    <div class="form-card-header attempt-form-heading">
+        <h3>Attempt Details</h3>
+        <p>Describe what you tried and the outcome.</p>
+    </div>
+
+    <form method="POST" class="investigation-form">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                    <small class="help-text">{{ field.help_text }}</small>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <small class="field-error">{{ error }}</small>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <div class="form-actions">
+            <a href="{% url 'investigation_detail' investigation.pk %}"
+               class="btn btn-secondary">
+                Cancel
+            </a>
+
+            <button type="submit" class="btn btn-primary">
+                Save Fix Attempt
+            </button>
+        </div>
+    </form>
+
+</div>
+
+{% endblock %}
